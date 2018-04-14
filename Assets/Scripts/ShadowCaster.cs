@@ -51,9 +51,6 @@ public class ShadowCaster : MonoBehaviour
             //shadowObjects.Add(newShadowGameObject);
         }
 
-        
-
-
     }
 
     private void GenerateShadowMeshes()
