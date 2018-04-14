@@ -42,6 +42,7 @@ public class ShadowCaster : MonoBehaviour
             GameObject newShadowGameObject = new GameObject("Shadow for Shape " + (i + ignoreShapes + 1));
             newShadowGameObject.AddComponent<MeshFilter>().mesh = shadowMesh;
             newShadowGameObject.AddComponent<MeshRenderer>().material = shadowMaterial;
+            newShadowGameObject.transform.position = Vector3.up * -0.1f;
             //shadowObjects.Add(newShadowGameObject);
         }
 
@@ -96,8 +97,8 @@ public class ShadowCaster : MonoBehaviour
                 ((numPoints * 2 - 2) * 3 + 0) + "," +
                 ((numPoints * 2 - 2) * 3 + 1) + "," +
                 ((numPoints * 2 - 2) * 3 + 2) + " || " + 
-                (numPoints * 2 - 2 - 1) + "," + 
                 (numPoints * 2 - 2) + "," + 
+                (numPoints * 2 - 1) + "," + 
                 (0));
             */
 
@@ -110,7 +111,7 @@ public class ShadowCaster : MonoBehaviour
                 ((numPoints * 2 - 2) * 3 + 3) + "," +
                 ((numPoints * 2 - 2) * 3 + 4) + "," +
                 ((numPoints * 2 - 2) * 3 + 5) + " || " +
-                (numPoints * 2 - 2) + "," +
+                (numPoints * 2 - 1) + "," +
                 (0) + "," +
                 (1));
             */

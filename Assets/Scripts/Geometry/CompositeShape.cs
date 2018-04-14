@@ -32,7 +32,8 @@ namespace Sebastian.Geometry
             {
                 vertices = vertices,
                 triangles = triangles,
-                normals = vertices.Select(x => Vector3.up).ToArray()
+                normals = vertices.Select(x => Vector3.up).ToArray(),
+                name = "Level Mesh"
             };
         }
 

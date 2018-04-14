@@ -25,6 +25,7 @@ public class ShapeEditor : Editor {
             {
                 GUILayout.BeginHorizontal();
                 GUILayout.Label("Shape " + (i + 1));
+                GUILayout.Label(" - Points " + shapeCreator.shapes[i].points.Count);
 
                 GUI.enabled = i != selectionInfo.selectedShapeIndex;
                 if (GUILayout.Button("Select"))
@@ -311,7 +312,7 @@ public class ShapeEditor : Editor {
                 }
                 else
                 {
-                    Handles.color = (shapeIsSelected) ? Color.white : deselctedShapeColour;
+                    Handles.color = (shapeIsSelected) ? new Color(1,1,1,0.5f) : deselctedShapeColour;
                 }
 
                 Handles.DrawSolidDisc(shapeToDraw.points[i], Vector3.up, shapeCreator.handleRadius);
