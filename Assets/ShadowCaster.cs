@@ -9,20 +9,59 @@ public class ShadowCaster : MonoBehaviour
 
     public float maxRange = 30;
 
-    public MeshFilter viewMeshFilter;
-    Mesh viewMesh;
+    //private List<MeshFilter> shadowMeshFilters = new List<MeshFilter>();
+    private List<Mesh> shadowMeshes = new List<Mesh>();
+    //private List<GameObject> shadowObjects = new List<GameObject>();
+    public Material shadowMaterial;
+
+    public int ignoreShapes = 2;
+
+
+    private int lastNumberOfShapes = 0;
 
     void Start()
     {
+        SetupMeshes();
+        /*
         viewMesh = new Mesh();
         viewMesh.name = "View Mesh";
         viewMeshFilter.mesh = viewMesh;
+        */
+
+        lastNumberOfShapes = shapeCreator.shapes.Count;
+    }
+
+    private void SetupMeshes()
+    {
+        for (int i = 0; i < shapeCreator.shapes.Count - ignoreShapes; i++)
+        {
+            Mesh shadowMesh = new Mesh();
+            shadowMesh.name = "Shadow Mesh for Shape " + (i + ignoreShapes);
+            shadowMeshes.Add(shadowMesh);
+
+            GameObject newShadowGameObject = new GameObject("Shadow for Shape " + (i + ignoreShapes));
+            newShadowGameObject.AddComponent<MeshFilter>().mesh = shadowMesh;
+            newShadowGameObject.AddComponent<MeshRenderer>().material = shadowMaterial;
+            //shadowObjects.Add(newShadowGameObject);
+        }
+
+        
+
+
     }
 
     private void GenerateShadowMeshes()
     {
 
-        for (int i = 2; i < shapeCreator.shapes.Count; i++)
+        if(lastNumberOfShapes != shapeCreator.shapes.Count)
+        {
+            SetupMeshes();
+            
+        }
+
+        lastNumberOfShapes = shapeCreator.shapes.Count;
+
+        for (int i = ignoreShapes; i < shapeCreator.shapes.Count; i++)
         {
 
             int numPoints = shapeCreator.shapes[i].points.Count;
@@ -76,10 +115,10 @@ public class ShadowCaster : MonoBehaviour
                 (1));
             */
 
-            viewMesh.Clear();
-            viewMesh.vertices = shadowMeshVertices;
-            viewMesh.triangles = shadowMeshIndices;
-            viewMesh.RecalculateNormals();
+            shadowMeshes[i - ignoreShapes].Clear();
+            shadowMeshes[i - ignoreShapes].vertices = shadowMeshVertices;
+            shadowMeshes[i - ignoreShapes].triangles = shadowMeshIndices;
+            shadowMeshes[i - ignoreShapes].RecalculateNormals();
         }
     }
 
