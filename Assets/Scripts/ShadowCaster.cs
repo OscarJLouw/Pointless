@@ -4,18 +4,23 @@ using UnityEngine;
 
 public class ShadowCaster : MonoBehaviour
 {
+    [SerializeField]
+    private ShapeCreator shapeCreator;
 
-    public ShapeCreator shapeCreator;
-
-    public float maxRange = 30;
+    [SerializeField]
+    private float maxRange = 30;
 
     //private List<MeshFilter> shadowMeshFilters = new List<MeshFilter>();
-    private List<Mesh> shadowMeshes = new List<Mesh>();
+
+
+    [HideInInspector]
+    public List<Mesh> shadowMeshes = new List<Mesh>();
     //private List<GameObject> shadowObjects = new List<GameObject>();
-    public Material shadowMaterial;
 
-    public int ignoreShapes = 2;
-
+    [SerializeField]
+    private Material shadowMaterial;
+    [SerializeField]
+    private int ignoreShapes = 2;
 
     private int lastNumberOfShapes = 0;
 
