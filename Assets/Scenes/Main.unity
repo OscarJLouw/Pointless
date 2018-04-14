@@ -113,7 +113,7 @@ NavMeshSettings:
     debug:
       m_Flags: 0
   m_NavMeshData: {fileID: 0}
---- !u!43 &239436627
+--- !u!43 &538739782
 Mesh:
   m_ObjectHideFlags: 0
   m_PrefabParentObject: {fileID: 0}
@@ -123,14 +123,14 @@ Mesh:
   m_SubMeshes:
   - serializedVersion: 2
     firstByte: 0
-    indexCount: 0
+    indexCount: 75
     topology: 0
     baseVertex: 0
     firstVertex: 0
-    vertexCount: 0
+    vertexCount: 29
     localAABB:
-      m_Center: {x: 0, y: 0, z: 0}
-      m_Extent: {x: 0, y: 0, z: 0}
+      m_Center: {x: 0.859467, y: 0, z: 0.70096743}
+      m_Extent: {x: 6.795614, y: 0, z: 4.285436}
   m_Shapes:
     vertices: []
     shapes: []
@@ -144,14 +144,18 @@ Mesh:
   m_KeepVertices: 1
   m_KeepIndices: 1
   m_IndexFormat: 0
-  m_IndexBuffer: 
+  m_IndexBuffer: 0100000008000400030002000b00050004000c000b0004000d000c0004000d00040002000e000d0002000e00020001000f000e00010010000f00010010000100080011001000080009001100080005000b000a00060005000a0006000a000900060009000800070006000800130012001500140013001500170016001c00180017001c00190018001c001a0019001c001b001a001c00
   m_Skin: []
   m_VertexData:
-    m_CurrentChannels: 1
-    m_VertexCount: 0
+    m_CurrentChannels: 3
+    m_VertexCount: 29
     m_Channels:
     - stream: 0
       offset: 0
+      format: 0
+      dimension: 3
+    - stream: 0
+      offset: 12
       format: 0
       dimension: 3
     - stream: 0
@@ -178,12 +182,8 @@ Mesh:
       offset: 0
       format: 0
       dimension: 0
-    - stream: 0
-      offset: 0
-      format: 0
-      dimension: 0
-    m_DataSize: 0
-    _typelessdata: 
+    m_DataSize: 696
+    _typelessdata: 8992b3c00000000024303b40000000000000803f00000000eaf4bdc0000000002b42cabf000000000000803f000000006c1e26c0000000006d3059c0000000000000803f000000001fb65a4000000000ef6765c0000000000000803f000000000508d74000000000626f23c0000000000000803f000000006cf6f440000000009c93ab3f000000000000803f00000000a914e5400000000018b08440000000000000803f000000008c74b9be000000009e909f40000000000000803f00000000c12490c0000000005b209240000000000000803f0000000090c6d6be00000000dacb8a40000000000000803f0000000082d0ca4000000000eb9d5e40000000000000803f000000006687dc400000000022cbb73f000000000000803f00000000800ac14000000000b3aef8bf000000000000803f000000005f605e4000000000e58934c0000000000000803f0000000048b8f6bf00000000e11a1cc0000000000000803f00000000e5bf9bc0000000001df580bf000000000000803f00000000644e99c000000000a0152a40000000000000803f000000005fdf80c00000000038a28140000000000000803f00000000c3d7dbbf000000001dc12240000000000000803f00000000ebc91ec00000000022cbb73f000000000000803f00000000515943bf000000009eb0a63f000000000000803f0000000058716abf000000001cfb1840000000000000803f00000000b9b99840000000002a4e7a3f000000000000803f0000000014e780400000000023c73a3f000000000000803f00000000e3d160400000000038982bbe000000000000803f00000000e57a6f400000000035077dbf000000000000803f00000000fa639c4000000000208194bf000000000000803f000000001ec5b1400000000028ba33bf000000000000803f000000009c53af4000000000188273bc000000000000803f00000000
   m_CompressedMesh:
     m_Vertices:
       m_NumItems: 0
@@ -237,8 +237,8 @@ Mesh:
       m_BitSize: 0
     m_UVInfo: 0
   m_LocalAABB:
-    m_Center: {x: 0, y: 0, z: 0}
-    m_Extent: {x: 0, y: 0, z: 0}
+    m_Center: {x: 0.859467, y: 0, z: 0.70096743}
+    m_Extent: {x: 6.795614, y: 0, z: 4.285436}
   m_MeshUsageFlags: 0
   m_BakedConvexCollisionMesh: 
   m_BakedTriangleCollisionMesh: 
@@ -284,7 +284,7 @@ Camera:
   m_Enabled: 1
   serializedVersion: 2
   m_ClearFlags: 1
-  m_BackGroundColor: {r: 0.19215687, g: 0.3019608, b: 0.4745098, a: 0}
+  m_BackGroundColor: {r: 0.20784314, g: 0.18039216, b: 0.1882353, a: 1}
   m_NormalizedViewPortRect:
     serializedVersion: 2
     x: 0
@@ -292,7 +292,7 @@ Camera:
     width: 1
     height: 1
   near clip plane: 0.3
-  far clip plane: 1000
+  far clip plane: 40
   field of view: 60
   orthographic: 1
   orthographic size: 5
@@ -317,13 +317,13 @@ Transform:
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 623610080}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: -10}
+  m_LocalRotation: {x: 0.7071068, y: 0, z: 0, w: 0.7071068}
+  m_LocalPosition: {x: 0, y: 20, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
   m_RootOrder: 0
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_LocalEulerAnglesHint: {x: 90, y: 0, z: 0}
 --- !u!1 &2001423202
 GameObject:
   m_ObjectHideFlags: 0
@@ -382,7 +382,7 @@ MeshFilter:
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 2001423202}
-  m_Mesh: {fileID: 239436627}
+  m_Mesh: {fileID: 538739782}
 --- !u!114 &2001423205
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -395,7 +395,40 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   meshFilter: {fileID: 2001423204}
-  shapes: []
+  shapes:
+  - points:
+    - {x: -5.6116376, y: 0, z: 2.9248133}
+    - {x: -5.9361467, y: 0, z: -1.5801443}
+    - {x: -2.5956068, y: 0, z: -3.3935807}
+    - {x: 3.4173658, y: 0, z: -3.5844686}
+    - {x: 6.719729, y: 0, z: -2.5536733}
+    - {x: 7.655081, y: 0, z: 1.3404422}
+    - {x: 7.158772, y: 0, z: 4.146496}
+    - {x: -0.3622173, y: 0, z: 4.9864035}
+    - {x: -4.5044866, y: 0, z: 4.5664496}
+  - points:
+    - {x: -4.027267, y: 0, z: 4.051052}
+    - {x: -4.790819, y: 0, z: 2.65757}
+    - {x: -4.8671746, y: 0, z: -1.0074803}
+    - {x: -1.9274988, y: 0, z: -2.4391406}
+    - {x: 3.474632, y: 0, z: -2.8209164}
+    - {x: 6.0325317, y: 0, z: -1.9428314}
+    - {x: 6.891528, y: 0, z: 1.4358866}
+    - {x: 6.3379526, y: 0, z: 3.4783885}
+    - {x: -0.41948366, y: 0, z: 4.337384}
+  - points:
+    - {x: -1.717522, y: 0, z: 2.5430367}
+    - {x: -2.481074, y: 0, z: 1.4358866}
+    - {x: -0.7630816, y: 0, z: 1.3022649}
+    - {x: -0.915792, y: 0, z: 2.3903265}
+  - points:
+    - {x: 4.772671, y: 0, z: 0.9777552}
+    - {x: 4.028208, y: 0, z: 0.7296011}
+    - {x: 3.5128105, y: 0, z: -0.16757286}
+    - {x: 3.741876, y: 0, z: -0.9883912}
+    - {x: 4.887204, y: 0, z: -1.1601906}
+    - {x: 5.555312, y: 0, z: -0.70205927}
+    - {x: 5.478956, y: 0, z: -0.01486256}
   showShapesList: 1
   handleRadius: 0.2
 --- !u!4 &2001423206
