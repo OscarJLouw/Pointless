@@ -1,6 +1,34 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
+
+public class EdgeRange
+{
+    public float dist;
+    public int count;
+    public int stageEdgeInt;
+
+    public EdgeRange(float _dist, int _count, int _stageEdgeInt)
+    {
+        dist = _dist;
+        count = _count;
+        stageEdgeInt = _stageEdgeInt;
+    }
+}
+
+public class Shadow
+{
+    public float startDist;
+    public float endDist;
+
+    public Shadow(float _startDist, float _endDist)
+    {
+        startDist = _startDist;
+        endDist = _endDist;
+    }
+}
+
 
 public class ShadowIntersection : MonoBehaviour {
 
@@ -11,6 +39,11 @@ public class ShadowIntersection : MonoBehaviour {
 
     [SerializeField]
     private int stageShape = 1;
+
+    private int intersectionEdgeCount = 0;
+    private bool openedEdge = false;
+
+    private List<EdgeRange> edgeRanges = new List<EdgeRange>();
 
     private List<Vector2> GetInnerStageVertex()
     {
@@ -51,17 +84,27 @@ public class ShadowIntersection : MonoBehaviour {
                     Vector2 stageVert1 = new Vector2(stageMeshVertices[k].x, stageMeshVertices[k].z);
                     Vector2 stageVert2 = new Vector2(stageMeshVertices[k2].x, stageMeshVertices[k2].z);
 
-
-
                     if (intersection.LineIntersection(stageVert1, stageVert2, shadowVert1, shadowVert2, ref intersectionVector))
                     {
                         intersectionsList.Add(intersectionVector);
-                        //Debug.Log(intersectionVector);
 
+                        float distanceAlongStageEdge = (stageVert2 - stageVert1).magnitude / (stageVert1 - intersectionVector).magnitude;
+                        edgeRanges.Add(new EdgeRange(distanceAlongStageEdge, intersectionEdgeCount, k));
+                        if (openedEdge)
+                        {
+                            openedEdge = false;
+                            intersectionEdgeCount++;
+                        } else
+                        {
+                            openedEdge = true;
+                        }
+                        //Debug.Log(intersectionVector);
+                        /*
                         GameObject sphere = GameObject.CreatePrimitive(PrimitiveType.Sphere);
                         Destroy(sphere, 0.01f);
                         sphere.transform.position = new Vector3(intersectionVector.x, 0, intersectionVector.y);
-                        sphere.transform.localScale = Vector3.one * 0.1f;
+                        sphere.transform.localScale = Vector3.one * (intersectionEdgeCount*0.01f + 0.05f);
+                        */
                     }
 
                 }
@@ -70,8 +113,47 @@ public class ShadowIntersection : MonoBehaviour {
         return intersectionsList;
     }
 
+    private void FindShadowBoundaries()
+    {
+        if (edgeRanges.Count > 0) {
+
+
+            List<EdgeRange> SortedList = edgeRanges.OrderBy(e => e.stageEdgeInt).ToList();
+            List<Shadow> shadowList = new List<Shadow>();
+
+            //List<Vector2> shadowEdges = new List<Vector2>();
+
+            int stageEdgeIndex = SortedList[0].stageEdgeInt;
+
+
+            for (int i = 0; i < edgeRanges.Count; i++)
+            {
+                EdgeRange thisEdgeRange = SortedList[i];
+                if (thisEdgeRange.stageEdgeInt != stageEdgeIndex)
+                {
+                    // reached next wall
+                    stageEdgeIndex = thisEdgeRange.stageEdgeInt;
+                } else
+                {
+                    shadowList.Add(new Shadow(thisEdgeRange.dist, thisEdgeRange.dist));
+                }
+        }
+
+        }
+        /*
+        if (!(k == stageMeshVertices.Length - 1))
+        {
+            k2 = k + 1;
+        }
+
+        Vector2 stageVert1 = new Vector2(stageMeshVertices[k].x, stageMeshVertices[k].z);
+        Vector2 stageVert2 = new Vector2(stageMeshVertices[k2].x, stageMeshVertices[k2].z);
+        */
+    }
+
     private void LateUpdate()
     {
         List<Vector2> testIntersection = GetInnerStageVertex();
+        intersectionEdgeCount = 0;
     }
 }
