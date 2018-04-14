@@ -17,6 +17,18 @@ public class EdgeRange
     }
 }
 
+public class ShadowSegment
+{
+    public float startDist;
+    public float endDist;
+
+    public ShadowSegment(float _startDist, float _endDist)
+    {
+        startDist = _startDist;
+        endDist = _endDist;
+    }
+}
+
 public class Shadow
 {
     public float startDist;
@@ -107,6 +119,8 @@ public class ShadowIntersection : MonoBehaviour {
                         */
                     }
 
+                    intersectionEdgeCount++;
+
                 }
             }
         }
@@ -117,25 +131,32 @@ public class ShadowIntersection : MonoBehaviour {
     {
         if (edgeRanges.Count > 0) {
 
+            List<List<Shadow>> wallShadows = new List<List<Shadow>>();
 
             List<EdgeRange> SortedList = edgeRanges.OrderBy(e => e.stageEdgeInt).ToList();
-            List<Shadow> shadowList = new List<Shadow>();
+            //List<Shadow> shadowList = new List<Shadow>();
 
             //List<Vector2> shadowEdges = new List<Vector2>();
 
             int stageEdgeIndex = SortedList[0].stageEdgeInt;
-
+            wallShadows.Add(new List<Shadow>());
 
             for (int i = 0; i < edgeRanges.Count; i++)
             {
                 EdgeRange thisEdgeRange = SortedList[i];
                 if (thisEdgeRange.stageEdgeInt != stageEdgeIndex)
                 {
+                    wallShadows.Add(new List<Shadow>());
                     // reached next wall
                     stageEdgeIndex = thisEdgeRange.stageEdgeInt;
                 } else
                 {
-                    shadowList.Add(new Shadow(thisEdgeRange.dist, thisEdgeRange.dist));
+                    List<Shadow> thisShadowList = wallShadows[wallShadows.Count];
+                    for (int shadow = 0; shadow < thisShadowList.Count; shadow++)
+                    {
+                        //thisShadowList[shadow]
+                    }
+                    thisShadowList.Add(new Shadow(thisEdgeRange.dist, thisEdgeRange.dist));
                 }
         }
 
