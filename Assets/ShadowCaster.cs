@@ -36,10 +36,10 @@ public class ShadowCaster : MonoBehaviour
         for (int i = 0; i < shapeCreator.shapes.Count - ignoreShapes; i++)
         {
             Mesh shadowMesh = new Mesh();
-            shadowMesh.name = "Shadow Mesh for Shape " + (i + ignoreShapes);
+            shadowMesh.name = "Shadow Mesh for Shape " + (i + ignoreShapes + 1);
             shadowMeshes.Add(shadowMesh);
 
-            GameObject newShadowGameObject = new GameObject("Shadow for Shape " + (i + ignoreShapes));
+            GameObject newShadowGameObject = new GameObject("Shadow for Shape " + (i + ignoreShapes + 1));
             newShadowGameObject.AddComponent<MeshFilter>().mesh = shadowMesh;
             newShadowGameObject.AddComponent<MeshRenderer>().material = shadowMaterial;
             //shadowObjects.Add(newShadowGameObject);
