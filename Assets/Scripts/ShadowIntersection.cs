@@ -12,7 +12,6 @@ public class ShadowIntersection : MonoBehaviour {
     [SerializeField]
     private int stageShape = 1;
 
-
     private List<Vector2> GetInnerStageVertex()
     {
         int numPoints = shapeCreator.shapes[stageShape].points.Count;
@@ -60,7 +59,8 @@ public class ShadowIntersection : MonoBehaviour {
                         //Debug.Log(intersectionVector);
 
                         GameObject sphere = GameObject.CreatePrimitive(PrimitiveType.Sphere);
-                        sphere.transform.position = new Vector3(shadowVert1.x + intersectionVector.x, 0, shadowVert1.y + intersectionVector.y);
+                        Destroy(sphere, 0.01f);
+                        sphere.transform.position = new Vector3(intersectionVector.x, 0, intersectionVector.y);
                         sphere.transform.localScale = Vector3.one * 0.1f;
                     }
 
