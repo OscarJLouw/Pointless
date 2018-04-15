@@ -56,6 +56,8 @@ public class ShadowVertex
 
 public class ShadowPoint
 {
+    
+        
     public float range;
     public Vector2 point;
     public int count; // +1 when enter shadow, -1 when exit shadow
@@ -83,7 +85,7 @@ public class BoundaryShadow
 }
 
 public class ShadowIntersection : MonoBehaviour {
-
+    public bool debugMode = false;
     [SerializeField]
     private Transform player;
 
@@ -282,6 +284,14 @@ public class ShadowIntersection : MonoBehaviour {
 
                     Vector2 edgeToIntersectionVector = new Vector2();
                     bool edgeToIntersection = (intersection.LineIntersection(edgeTo, edgeToFar, stageVert1, stageVert2, ref edgeToIntersectionVector));
+
+                    /*if (edgeFromIntersection && !edgeToIntersection)
+                    {
+                        shadows.Add(new ShadowPoint(Vector2.Distance(edgeFromIntersectionVector, stageVert1), edgeFromIntersectionVector, +1));
+                    } else if (!edgeFromIntersection && edgeToIntersection)
+                    {
+                        shadows.Add(new ShadowPoint(Vector2.Distance(edgeToIntersectionVector, stageVert1), edgeToIntersectionVector, -1));
+                    } else*/
                     if (edgeFromIntersection && edgeToIntersection) { // todo handle corner shapes
                         // sort vertices
                         if (Vector3.Distance(edgeFromIntersectionVector, stageVert1) > Vector3.Distance(edgeToIntersectionVector, stageVert1)) { // fix
@@ -300,7 +310,9 @@ public class ShadowIntersection : MonoBehaviour {
 
         List<BoundaryShadow> boundaryShadows = new List<BoundaryShadow>();
 
-        for(int boundary = 0; boundary < shadowsPerBoundary.Count; boundary++)
+        
+
+        for (int boundary = 0; boundary < shadowsPerBoundary.Count; boundary++)
         {
             int counter = 0;
             List<ShadowPoint> sortedShadowPointList = shadowsPerBoundary[boundary].OrderBy(o => o.range).ToList();
@@ -329,6 +341,7 @@ public class ShadowIntersection : MonoBehaviour {
             Vector3 boundaryStartPoint = shapeCreator.shapes[stageShape].points[shadow.boundaryIndex];
             Vector3 boundaryEndPoint = shapeCreator.shapes[stageShape].points[(shadow.boundaryIndex+1) % (shapeCreator.shapes[stageShape].points.Count)];
 
+
             /*GameObject thisLineRenderer = new GameObject("thisLineRend");
             thisLineRenderer.AddComponent<LineRenderer>();
             thisLineRenderer.AddComponent<OutlineProjection>();
@@ -348,6 +361,23 @@ public class ShadowIntersection : MonoBehaviour {
             /*
             testOutline.Add(new Vector2(sphere.transform.position.x, sphere.transform.position.z));
             testOutline.Add(new Vector2(sphere2.transform.position.x, sphere2.transform.position.z));
+
+            if (debugMode)
+            {
+                GameObject sphere = GameObject.CreatePrimitive(PrimitiveType.Sphere);
+                Destroy(sphere, 0.01f);
+                sphere.transform.position = boundaryStartPoint + (boundaryEndPoint - boundaryStartPoint).normalized * shadow.minRange;// * (boundaryEndPoint - boundaryStartPoint).magnitude;
+                sphere.transform.localScale = Vector3.one * 0.1f;
+
+
+                GameObject sphere2 = GameObject.CreatePrimitive(PrimitiveType.Sphere);
+                Destroy(sphere2, 0.01f);
+                sphere2.transform.position = boundaryStartPoint + (boundaryEndPoint - boundaryStartPoint).normalized * shadow.maxRange;// * (boundaryEndPoint - boundaryStartPoint).magnitude;
+                sphere2.transform.localScale = Vector3.one * 0.1f;
+            }
+        }
+
+
 
             go.GetComponent<OutlineProjection>().SetKeyOutline(testOutline.ToArray());
             testOutline.Clear();*/

@@ -40,6 +40,13 @@ public class ShapeEditor : Editor {
                 }
                 GUILayout.EndHorizontal();
             }
+
+            if(GUILayout.Button("Export Mesh"))
+            {
+                AssetDatabase.CreateAsset( shapeCreator.meshFilter.mesh, "Assets/Levels/mesh.asset" );
+                AssetDatabase.SaveAssets();
+
+            }
         }
 
         if (shapeDeleteIndex != -1)
