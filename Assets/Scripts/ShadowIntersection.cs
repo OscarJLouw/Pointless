@@ -251,11 +251,13 @@ public class ShadowIntersection : MonoBehaviour {
 
             var shape = shapeCreator.shapes[shapeIndex];
             for (int i = 0; i < shape.points.Count; i++) {
-                Vector3 edgeFrom = shape.points[i];
-                Vector3 edgeTo = shape.points[(i+1)%shape.points.Count];
+                Vector2 edgeFrom = new Vector2(shape.points[i].x, shape.points[i].z);
+                Vector2 edgeTo = new Vector2(shape.points[(i+1)%shape.points.Count].x, shape.points[(i + 1) % shape.points.Count].z);
 
-                Vector3 edgeFromFar = edgeFrom + (edgeFrom - player.position).normalized * shadowCaster.maxRange;
-                Vector3 edgeToFar = edgeTo + (edgeTo - player.position).normalized * shadowCaster.maxRange;
+                Vector2 playerPos = new Vector2(player.position.x, player.position.z);
+
+                Vector2 edgeFromFar = edgeFrom + (edgeFrom - playerPos).normalized * shadowCaster.maxRange;
+                Vector2 edgeToFar = edgeTo + (edgeTo - playerPos).normalized * shadowCaster.maxRange;
 
                 for (int boundaryEdgeFrom = 0; boundaryEdgeFrom < shapeCreator.shapes[stageShape].points.Count; boundaryEdgeFrom++)
                 {
@@ -283,8 +285,8 @@ public class ShadowIntersection : MonoBehaviour {
                             edgeFromIntersectionVector = edgeToIntersectionVector;
                             edgeToIntersectionVector = tmp;
                         }
-                        shadows.Add(new ShadowPoint(Vector3.Distance(edgeFromIntersectionVector, stageVert1), edgeFromIntersectionVector, +1));
-                        shadows.Add(new ShadowPoint(Vector3.Distance(edgeToIntersectionVector, stageVert1), edgeToIntersectionVector, -1));
+                        shadows.Add(new ShadowPoint(Vector2.Distance(edgeFromIntersectionVector, stageVert1), edgeFromIntersectionVector, +1));
+                        shadows.Add(new ShadowPoint(Vector2.Distance(edgeToIntersectionVector, stageVert1), edgeToIntersectionVector, -1));
                     }
 
                 }
@@ -325,13 +327,13 @@ public class ShadowIntersection : MonoBehaviour {
             
             GameObject sphere = GameObject.CreatePrimitive(PrimitiveType.Sphere);
             Destroy(sphere, 0.01f);
-            sphere.transform.position = boundaryStartPoint + (boundaryEndPoint- boundaryStartPoint).normalized * shadow.minRange * (boundaryEndPoint - boundaryStartPoint).magnitude;
+            sphere.transform.position = boundaryStartPoint + (boundaryEndPoint - boundaryStartPoint).normalized * shadow.minRange;// * (boundaryEndPoint - boundaryStartPoint).magnitude;
             sphere.transform.localScale = Vector3.one * 0.2f;
             
             
             GameObject sphere2 = GameObject.CreatePrimitive(PrimitiveType.Sphere);
             Destroy(sphere2, 0.01f);
-            sphere2.transform.position = boundaryStartPoint + (boundaryEndPoint - boundaryStartPoint).normalized * shadow.maxRange * (boundaryEndPoint - boundaryStartPoint).magnitude;
+            sphere2.transform.position = boundaryStartPoint + (boundaryEndPoint - boundaryStartPoint).normalized * shadow.maxRange;// * (boundaryEndPoint - boundaryStartPoint).magnitude;
             sphere2.transform.localScale = Vector3.one * 0.2f;
             
         }
