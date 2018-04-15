@@ -33,17 +33,51 @@ public class ShadowRange
 public class ShadowVertex
 {
     public int shapeIndex;
+    public int wallIndex;
     public Vector3 position;
+    public float percentAlongWall;
 
-    public ShadowVertex(int _shapeIndex, Vector3 _position)
+    public ShadowVertex(int _shapeIndex, int _wallIndex, Vector3 _position, float _percentAlongWall)
     {
         shapeIndex = _shapeIndex;
+        wallIndex = _wallIndex;
         position = _position;
+        percentAlongWall = _percentAlongWall;
     }
-    public ShadowVertex(int _shapeIndex, Vector2 _2DPosition)
+    public ShadowVertex(int _shapeIndex, int _wallIndex, Vector2 _2DPosition, float _percentAlongWall)
     {
         shapeIndex = _shapeIndex;
+        wallIndex = _wallIndex;
         position = new Vector3(_2DPosition.x, 0, _2DPosition.y);
+        percentAlongWall = _percentAlongWall;
+    }
+}
+
+public class ShadowPoint
+{
+    public float range;
+    public Vector2 point;
+    public int count; // +1 when enter shadow, -1 when exit shadow
+
+    public ShadowPoint(float range, Vector2 point, int count)
+    {
+        this.range = range;
+        this.point = point;
+        this.count = count;
+    }
+}
+
+public class BoundaryShadow
+{
+    public int boundaryIndex;
+    public float minRange;
+    public float maxRange;
+
+    public BoundaryShadow(int boundaryIndex, float minRange, float maxRange)
+    {
+        this.boundaryIndex = boundaryIndex;
+        this.minRange = minRange;
+        this.maxRange = maxRange;
     }
 }
 
@@ -61,13 +95,15 @@ public class ShadowIntersection : MonoBehaviour {
     private int stageShape = 1;
 
     private List<ShadowRange> shadowRanges = new List<ShadowRange>();
-    List<ShadowVertex> allShadowEdges = new List<ShadowVertex>();
+    List<ShadowVertex> allShadowVertices = new List<ShadowVertex>();
+
+    SegmentIntersection intersection;
 
     private List<Vector2> GetInnerStageVertex()
     {
         int numPoints = shapeCreator.shapes[stageShape].points.Count;
         List<Vector2> intersectionsList = new List<Vector2>();
-        SegmentIntersection intersection = gameObject.GetComponent<SegmentIntersection>();
+        intersection = gameObject.GetComponent<SegmentIntersection>();
         Vector3[] stageMeshVertices = new Vector3[numPoints];
         Vector2 intersectionVector = new Vector2();
         for (int i = 0; i < numPoints; i++)
@@ -113,7 +149,7 @@ public class ShadowIntersection : MonoBehaviour {
                         {
 
                             p = shapeCreator.shapes[shape].points.Count;
-                            allShadowEdges.Add(new ShadowVertex(stageShape, stageVert1));
+                            allShadowVertices.Add(new ShadowVertex(stageShape, k, stageVert1, 0));
 
                         }
                     }
@@ -140,7 +176,7 @@ public class ShadowIntersection : MonoBehaviour {
                     {
                         intersectionsList.Add(intersectionVector);
 
-                        float distanceAlongStageEdge = (stageVert2 - stageVert1).magnitude / (stageVert1 - intersectionVector).magnitude;
+                        float distanceAlongStageEdge = (intersectionVector - stageVert1).magnitude / (stageVert2 - stageVert1).magnitude;
 
                         shadowRange.rangePointPairs.Add(new RangePointPair(distanceAlongStageEdge, intersectionVector));
 
@@ -163,32 +199,17 @@ public class ShadowIntersection : MonoBehaviour {
     private void ComputeShadowBoundaries()
     {
 
-        for (int borderVertexIndex = 0; borderVertexIndex < shapeCreator.shapes[stageShape].points.Count; borderVertexIndex++)
-        {
-            Vector3 vertex = shapeCreator.shapes[stageShape].points[borderVertexIndex];
-
-            //allShadowEdges.Add(new ShadowVertex(stageShape, vertex));
-            //Debug.DrawLine(player.position, vertex);
-            RaycastHit hit = new RaycastHit();
-            Ray ray = new Ray(player.position, vertex - player.position);
-            if(Physics.Raycast(ray, out hit))
-            {
-                Debug.Log("Hi");
-                allShadowEdges.Add(new ShadowVertex(stageShape, vertex));
-            }
-        }
-
         for (int i = 0; i < shadowRanges.Count; i++)
         {
             if (shadowRanges[i].rangePointPairs.Count > 0)
             {
-                List<RangePointPair> sortedRanges = shadowRanges[i].rangePointPairs.OrderBy(r => r.intersectionRange).ToList();
+                List<RangePointPair> sortedRanges = shadowRanges[i].rangePointPairs.OrderBy(sr => sr.intersectionRange).ToList();
 
                 Vector2 shadowStart = sortedRanges[0].worldPosition;
                 Vector2 shadowEnd = sortedRanges[sortedRanges.Count-1].worldPosition;
 
-                allShadowEdges.Add(new ShadowVertex(i, shadowStart));
-                allShadowEdges.Add(new ShadowVertex(i, shadowEnd));
+                allShadowVertices.Add(new ShadowVertex(i, shadowRanges[i].wallSegmentIndex, shadowStart, sortedRanges[0].intersectionRange));
+                allShadowVertices.Add(new ShadowVertex(i, shadowRanges[i].wallSegmentIndex, shadowEnd, sortedRanges[sortedRanges.Count - 1].intersectionRange));
 
                 /*
                 GameObject sphere = GameObject.CreatePrimitive(PrimitiveType.Sphere);
@@ -205,15 +226,222 @@ public class ShadowIntersection : MonoBehaviour {
             }
         }
 
-        for (int shadowVertex = 0; shadowVertex < allShadowEdges.Count; shadowVertex++)
+        // sort allShadowVertices by wall index
+        // 
+        
+        List<ShadowVertex> sortedShadowVertices = allShadowVertices.OrderBy(asv => asv.wallIndex).ToList();
+
+        List<List<ShadowVertex>> wallVertexCollections = new List<List<ShadowVertex>>();
+
+        int wallIndex = sortedShadowVertices[0].wallIndex;
+
+        wallVertexCollections.Add(new List<ShadowVertex>());
+
+
+
+        List <List <ShadowPoint>> shadowsPerBoundary = new  List < List <ShadowPoint>>();
+        for (int boundaryEdgeFrom = 0; boundaryEdgeFrom < shapeCreator.shapes[stageShape].points.Count; boundaryEdgeFrom++)
         {
-            GameObject sphere = GameObject.CreatePrimitive(PrimitiveType.Sphere);
-            Destroy(sphere, 0.01f);
-            sphere.transform.position = allShadowEdges[shadowVertex].position;
-            sphere.transform.localScale = Vector3.one * 0.1f;
+            shadowsPerBoundary.Add(new List<ShadowPoint>());
+        }
+        for (int shapeIndex = stageShape+1; shapeIndex < shapeCreator.shapes.Count; shapeIndex++)
+        {
+            // iterate edges
+            
+
+            var shape = shapeCreator.shapes[shapeIndex];
+            for (int i = 0; i < shape.points.Count; i++) {
+                Vector3 edgeFrom = shape.points[i];
+                Vector3 edgeTo = shape.points[(i+1)%shape.points.Count];
+
+                Vector3 edgeFromFar = edgeFrom + (edgeFrom - player.position).normalized * shadowCaster.maxRange;
+                Vector3 edgeToFar = edgeTo + (edgeTo - player.position).normalized * shadowCaster.maxRange;
+
+                for (int boundaryEdgeFrom = 0; boundaryEdgeFrom < shapeCreator.shapes[stageShape].points.Count; boundaryEdgeFrom++)
+                {
+                    List<ShadowPoint> shadows = shadowsPerBoundary[boundaryEdgeFrom];
+                    int boundaryEdgeTo = 0;
+
+                    if (!(boundaryEdgeFrom == shapeCreator.shapes[stageShape].points.Count - 1))
+                    {
+                        boundaryEdgeTo = boundaryEdgeFrom + 1;
+                    }
+
+                    Vector2 stageVert1 = new Vector2(shapeCreator.shapes[stageShape].points[boundaryEdgeFrom].x, shapeCreator.shapes[stageShape].points[boundaryEdgeFrom].z);
+                    Vector2 stageVert2 = new Vector2(shapeCreator.shapes[stageShape].points[boundaryEdgeTo].x, shapeCreator.shapes[stageShape].points[boundaryEdgeTo].z);
+
+                    Vector2 edgeFromIntersectionVector = new Vector2();
+                    bool edgeFromIntersection = (intersection.LineIntersection(edgeFrom, edgeFromFar, stageVert1, stageVert2, ref edgeFromIntersectionVector));
+
+
+                    Vector2 edgeToIntersectionVector = new Vector2();
+                    bool edgeToIntersection = (intersection.LineIntersection(edgeTo, edgeToFar, stageVert1, stageVert2, ref edgeToIntersectionVector));
+                    if (edgeFromIntersection && edgeToIntersection) { // todo handle corner shapes
+                        // sort vertices
+                        if (Vector3.Distance(edgeFromIntersectionVector, stageVert1) > Vector3.Distance(edgeToIntersectionVector, stageVert1)) { // fix
+                            var tmp = edgeFromIntersectionVector; // swap
+                            edgeFromIntersectionVector = edgeToIntersectionVector;
+                            edgeToIntersectionVector = tmp;
+                        }
+                        shadows.Add(new ShadowPoint(Vector3.Distance(edgeFromIntersectionVector, stageVert1), edgeFromIntersectionVector, +1));
+                        shadows.Add(new ShadowPoint(Vector3.Distance(edgeToIntersectionVector, stageVert1), edgeToIntersectionVector, -1));
+                    }
+
+                }
+
+            }
         }
 
-        allShadowEdges.Clear();
+        List<BoundaryShadow> boundaryShadows = new List<BoundaryShadow>();
+
+        for(int boundary = 0; boundary < shadowsPerBoundary.Count; boundary++)
+        {
+            int counter = 0;
+            List<ShadowPoint> sortedShadowPointList = shadowsPerBoundary[boundary].OrderBy(o => o.range).ToList();
+
+            foreach (ShadowPoint shadowPoint in sortedShadowPointList)
+            {
+                if (counter == 0)
+                {
+                    counter += shadowPoint.count;
+                    if (counter > 0)
+                        boundaryShadows.Add(new BoundaryShadow(boundary, shadowPoint.range, shadowPoint.range));
+                    else
+                        Debug.Log("Oh dear - closed a shadow that wasn't opened");
+                } else
+                {
+                    counter += shadowPoint.count;
+                    boundaryShadows[boundaryShadows.Count-1].maxRange = shadowPoint.range;
+                }
+
+            }
+        }
+
+        foreach (var shadow in boundaryShadows)
+        {
+
+            Vector3 boundaryStartPoint = shapeCreator.shapes[stageShape].points[shadow.boundaryIndex];
+            Vector3 boundaryEndPoint = shapeCreator.shapes[stageShape].points[(shadow.boundaryIndex+1) % (shapeCreator.shapes[stageShape].points.Count)];
+            
+            GameObject sphere = GameObject.CreatePrimitive(PrimitiveType.Sphere);
+            Destroy(sphere, 0.01f);
+            sphere.transform.position = boundaryStartPoint + (boundaryEndPoint- boundaryStartPoint).normalized * shadow.minRange * (boundaryEndPoint - boundaryStartPoint).magnitude;
+            sphere.transform.localScale = Vector3.one * 0.2f;
+            
+            
+            GameObject sphere2 = GameObject.CreatePrimitive(PrimitiveType.Sphere);
+            Destroy(sphere2, 0.01f);
+            sphere2.transform.position = boundaryStartPoint + (boundaryEndPoint - boundaryStartPoint).normalized * shadow.maxRange * (boundaryEndPoint - boundaryStartPoint).magnitude;
+            sphere2.transform.localScale = Vector3.one * 0.2f;
+            
+        }
+
+
+
+        /*
+        for (int shadowVertex = 0; shadowVertex < sortedShadowVertices.Count; shadowVertex++)
+        {
+            if(sortedShadowVertices[shadowVertex].wallIndex == wallIndex)
+            {
+                wallVertexCollections[wallVertexCollections.Count-1].Add(sortedShadowVertices[shadowVertex]);
+
+                
+            } else
+            {
+                wallVertexCollections[wallVertexCollections.Count - 1].Add(sortedShadowVertices[shadowVertex]);
+                wallIndex = sortedShadowVertices[shadowVertex].wallIndex;
+                wallVertexCollections.Add(new List<ShadowVertex>());
+            }
+            
+            //if(sortedShadowVertices[shadowVertex])
+            GameObject sphere = GameObject.CreatePrimitive(PrimitiveType.Sphere);
+            Destroy(sphere, 0.01f);
+            sphere.transform.position = sortedShadowVertices[shadowVertex].position;
+            sphere.transform.localScale = Vector3.one * (0.1f + 0.1f * sortedShadowVertices[shadowVertex].wallIndex);
+            
+        }
+        */
+
+
+        /*
+        for (int vertexWallListIndex = 0; vertexWallListIndex < wallVertexCollections.Count; vertexWallListIndex++)
+        {
+            // sort all walls by their percentage along the parent wall
+             List<ShadowVertex> thisWallVertexList = wallVertexCollections[vertexWallListIndex].OrderBy(wvc => wvc.percentAlongWall).ToList();
+            
+            Debug.Log("vertexWallListIndex: " + vertexWallListIndex);
+            Debug.Log("Min: " + thisWallVertexList[0].percentAlongWall);
+            Debug.Log("Max: " + thisWallVertexList[thisWallVertexList.Count - 1].percentAlongWall);
+
+            int k = thisWallVertexList[0].wallIndex;
+            int k2 = 0;
+            
+            if (!(k == shapeCreator.shapes[stageShape].points.Count - 1))
+            {
+                k2 = k + 1;
+            }
+
+            int l = thisWallVertexList[thisWallVertexList.Count - 1].wallIndex;
+            int l2 = 0;
+
+            if (!(l == shapeCreator.shapes[stageShape].points.Count - 1))
+            {
+                l2 = l + 1;
+            }
+
+            Vector2 stageVert1FP1 = new Vector2(shapeCreator.shapes[stageShape].points[k].x, shapeCreator.shapes[stageShape].points[k].z);
+            Vector2 stageVert2FP1 = new Vector2(shapeCreator.shapes[stageShape].points[k2].x, shapeCreator.shapes[stageShape].points[k2].z);
+
+            Vector2 stageVert1FP2 = new Vector2(shapeCreator.shapes[stageShape].points[l].x, shapeCreator.shapes[stageShape].points[l].z);
+            Vector2 stageVert2FP2 = new Vector2(shapeCreator.shapes[stageShape].points[l2].x, shapeCreator.shapes[stageShape].points[l2].z);
+
+
+            Vector2 normalisedDirectionFP1 = (stageVert2FP1 - stageVert1FP1).normalized;
+            Vector2 normalisedDirectionFP2 = (stageVert2FP2 - stageVert1FP2).normalized;
+
+            Vector2 finalPosition1 = stageVert1FP1 + normalisedDirectionFP1 * (stageVert2FP1 - stageVert1FP1).magnitude * thisWallVertexList[0].percentAlongWall;
+            Vector2 finalPosition2 = stageVert1FP2 + normalisedDirectionFP2 * (stageVert2FP2 - stageVert1FP2).magnitude * thisWallVertexList[thisWallVertexList.Count - 1].percentAlongWall;
+
+            Vector3 objectTransform1 = new Vector3(finalPosition1.x, 0, finalPosition1.y);
+            Vector3 objectTransform2 = new Vector3(finalPosition2.x, 0, finalPosition2.y);
+
+            
+            GameObject sphere = GameObject.CreatePrimitive(PrimitiveType.Sphere);
+            Destroy(sphere, 0.01f);
+            sphere.transform.position = objectTransform1;
+            sphere.transform.localScale = Vector3.one * 0.1f;
+            
+
+            GameObject sphere2 = GameObject.CreatePrimitive(PrimitiveType.Sphere);
+            Destroy(sphere2, 0.01f);
+            sphere2.transform.position = objectTransform2;
+            sphere2.transform.localScale = Vector3.one * 0.1f;
+            
+            
+            GameObject sphere3 = GameObject.CreatePrimitive(PrimitiveType.Sphere);
+            Destroy(sphere3, 0.01f);
+            sphere3.transform.position = thisWallVertexList[0].position;
+            sphere3.transform.localScale = Vector3.one * 0.1f;
+
+            GameObject sphere4 = GameObject.CreatePrimitive(PrimitiveType.Sphere);
+            Destroy(sphere4, 0.01f);
+            sphere4.transform.position = thisWallVertexList[thisWallVertexList.Count-1].position;
+            sphere4.transform.localScale = Vector3.one * 0.1f;
+            
+            /*
+            /*
+            Vector3 min = Vector3.zero;
+            Vector3 max = Vector3.zero;
+
+            for (int shadowVertices = 0; shadowVertices < wallVertexCollections[vertexWallListIndex].Count; shadowVertices++)
+            {
+                if
+                wallVertexCollections[vertexWallListIndex]
+            }
+            
+        }
+        */
+        allShadowVertices.Clear();
     }
 
 

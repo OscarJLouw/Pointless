@@ -12,6 +12,7 @@ public class LightController : MonoBehaviour
     void Start()
     {
         rb = GetComponent<Rigidbody>();
+        target = transform.position;
     }
 
     // Update is called once per frame

@@ -7,8 +7,7 @@ public class ShadowCaster : MonoBehaviour
     [SerializeField]
     private ShapeCreator shapeCreator;
 
-    [SerializeField]
-    private float maxRange = 30;
+    public float maxRange = 30;
 
     //private List<MeshFilter> shadowMeshFilters = new List<MeshFilter>();
 
