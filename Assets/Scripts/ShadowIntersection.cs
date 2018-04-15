@@ -55,6 +55,8 @@ public class ShadowVertex
 
 public class ShadowPoint
 {
+    
+        
     public float range;
     public Vector2 point;
     public int count; // +1 when enter shadow, -1 when exit shadow
@@ -82,7 +84,7 @@ public class BoundaryShadow
 }
 
 public class ShadowIntersection : MonoBehaviour {
-
+    public bool debugMode = false;
     [SerializeField]
     private Transform player;
 
@@ -324,18 +326,20 @@ public class ShadowIntersection : MonoBehaviour {
 
             Vector3 boundaryStartPoint = shapeCreator.shapes[stageShape].points[shadow.boundaryIndex];
             Vector3 boundaryEndPoint = shapeCreator.shapes[stageShape].points[(shadow.boundaryIndex+1) % (shapeCreator.shapes[stageShape].points.Count)];
-            
-            GameObject sphere = GameObject.CreatePrimitive(PrimitiveType.Sphere);
-            Destroy(sphere, 0.01f);
-            sphere.transform.position = boundaryStartPoint + (boundaryEndPoint - boundaryStartPoint).normalized * shadow.minRange;// * (boundaryEndPoint - boundaryStartPoint).magnitude;
-            sphere.transform.localScale = Vector3.one * 0.2f;
-            
-            
-            GameObject sphere2 = GameObject.CreatePrimitive(PrimitiveType.Sphere);
-            Destroy(sphere2, 0.01f);
-            sphere2.transform.position = boundaryStartPoint + (boundaryEndPoint - boundaryStartPoint).normalized * shadow.maxRange;// * (boundaryEndPoint - boundaryStartPoint).magnitude;
-            sphere2.transform.localScale = Vector3.one * 0.2f;
-            
+
+            if (debugMode)
+            {
+                GameObject sphere = GameObject.CreatePrimitive(PrimitiveType.Sphere);
+                Destroy(sphere, 0.01f);
+                sphere.transform.position = boundaryStartPoint + (boundaryEndPoint - boundaryStartPoint).normalized * shadow.minRange;// * (boundaryEndPoint - boundaryStartPoint).magnitude;
+                sphere.transform.localScale = Vector3.one * 0.1f;
+
+
+                GameObject sphere2 = GameObject.CreatePrimitive(PrimitiveType.Sphere);
+                Destroy(sphere2, 0.01f);
+                sphere2.transform.position = boundaryStartPoint + (boundaryEndPoint - boundaryStartPoint).normalized * shadow.maxRange;// * (boundaryEndPoint - boundaryStartPoint).magnitude;
+                sphere2.transform.localScale = Vector3.one * 0.1f;
+            }
         }
 
 
