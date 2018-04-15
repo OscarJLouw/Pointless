@@ -280,6 +280,14 @@ public class ShadowIntersection : MonoBehaviour {
 
                     Vector2 edgeToIntersectionVector = new Vector2();
                     bool edgeToIntersection = (intersection.LineIntersection(edgeTo, edgeToFar, stageVert1, stageVert2, ref edgeToIntersectionVector));
+
+                    /*if (edgeFromIntersection && !edgeToIntersection)
+                    {
+                        shadows.Add(new ShadowPoint(Vector2.Distance(edgeFromIntersectionVector, stageVert1), edgeFromIntersectionVector, +1));
+                    } else if (!edgeFromIntersection && edgeToIntersection)
+                    {
+                        shadows.Add(new ShadowPoint(Vector2.Distance(edgeToIntersectionVector, stageVert1), edgeToIntersectionVector, -1));
+                    } else*/
                     if (edgeFromIntersection && edgeToIntersection) { // todo handle corner shapes
                         // sort vertices
                         if (Vector3.Distance(edgeFromIntersectionVector, stageVert1) > Vector3.Distance(edgeToIntersectionVector, stageVert1)) { // fix
@@ -298,7 +306,9 @@ public class ShadowIntersection : MonoBehaviour {
 
         List<BoundaryShadow> boundaryShadows = new List<BoundaryShadow>();
 
-        for(int boundary = 0; boundary < shadowsPerBoundary.Count; boundary++)
+        
+
+        for (int boundary = 0; boundary < shadowsPerBoundary.Count; boundary++)
         {
             int counter = 0;
             List<ShadowPoint> sortedShadowPointList = shadowsPerBoundary[boundary].OrderBy(o => o.range).ToList();

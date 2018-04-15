@@ -29,5 +29,6 @@ public class LightController : MonoBehaviour
             
         }
         rb.velocity = Vector3.ClampMagnitude((target - transform.position) * Time.deltaTime * 500, 30);
+        
     }
 }
