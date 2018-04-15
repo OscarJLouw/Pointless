@@ -8,6 +8,7 @@ public struct RangePointPair
 {
     public float intersectionRange;
     public Vector2 worldPosition;
+    
 
     public RangePointPair(float _intersectionRange, Vector2 _worldPosition)
     {
@@ -98,6 +99,8 @@ public class ShadowIntersection : MonoBehaviour {
     List<ShadowVertex> allShadowVertices = new List<ShadowVertex>();
 
     SegmentIntersection intersection;
+
+    public GameObject outlinePrPrefab;
 
     private List<Vector2> GetInnerStageVertex()
     {
@@ -198,6 +201,7 @@ public class ShadowIntersection : MonoBehaviour {
     
     private void ComputeShadowBoundaries()
     {
+       // OutlineProjection outlinePr = GameObject.Find("OutlinePlayerKey").GetComponent<OutlineProjection>();
 
         for (int i = 0; i < shadowRanges.Count; i++)
         {
@@ -318,13 +322,19 @@ public class ShadowIntersection : MonoBehaviour {
 
             }
         }
-
+       
         foreach (var shadow in boundaryShadows)
         {
-
+          //  List<Vector2> testOutline = new List<Vector2>();
             Vector3 boundaryStartPoint = shapeCreator.shapes[stageShape].points[shadow.boundaryIndex];
             Vector3 boundaryEndPoint = shapeCreator.shapes[stageShape].points[(shadow.boundaryIndex+1) % (shapeCreator.shapes[stageShape].points.Count)];
-            
+
+            /*GameObject thisLineRenderer = new GameObject("thisLineRend");
+            thisLineRenderer.AddComponent<LineRenderer>();
+            thisLineRenderer.AddComponent<OutlineProjection>();
+            Instantiate(thisLineRenderer, new Vector3(0,0,0), Quaternion.identity);*/
+           // GameObject go= Instantiate(outlinePrPrefab);
+
             GameObject sphere = GameObject.CreatePrimitive(PrimitiveType.Sphere);
             Destroy(sphere, 0.01f);
             sphere.transform.position = boundaryStartPoint + (boundaryEndPoint - boundaryStartPoint).normalized * shadow.minRange;// * (boundaryEndPoint - boundaryStartPoint).magnitude;
@@ -335,11 +345,15 @@ public class ShadowIntersection : MonoBehaviour {
             Destroy(sphere2, 0.01f);
             sphere2.transform.position = boundaryStartPoint + (boundaryEndPoint - boundaryStartPoint).normalized * shadow.maxRange;// * (boundaryEndPoint - boundaryStartPoint).magnitude;
             sphere2.transform.localScale = Vector3.one * 0.2f;
-            
+            /*
+            testOutline.Add(new Vector2(sphere.transform.position.x, sphere.transform.position.z));
+            testOutline.Add(new Vector2(sphere2.transform.position.x, sphere2.transform.position.z));
+
+            go.GetComponent<OutlineProjection>().SetKeyOutline(testOutline.ToArray());
+            testOutline.Clear();*/
+
         }
-
-
-
+        
         /*
         for (int shadowVertex = 0; shadowVertex < sortedShadowVertices.Count; shadowVertex++)
         {

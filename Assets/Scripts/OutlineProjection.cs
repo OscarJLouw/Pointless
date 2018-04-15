@@ -12,10 +12,10 @@ public class OutlineProjection : MonoBehaviour {
     // Use this for initialization
     void Start () {
         //test points
-        testIntersections[0] = new Vector2((float)-0.5097109, (float)3.74515);
+       /* testIntersections[0] = new Vector2((float)-0.5097109, (float)3.74515);
         testIntersections[1] = new Vector2((float)-0.006582094, (float)3.996876);
         testIntersections[2] = new Vector2((float)0.5090174, (float)3.750584);
-        
+        */
         lineRenderer = GetComponent<LineRenderer>();
         SetKeyOutline(testIntersections);
     }
