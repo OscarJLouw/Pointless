@@ -61,6 +61,7 @@ public class ShadowIntersection : MonoBehaviour {
     private int stageShape = 1;
 
     private List<ShadowRange> shadowRanges = new List<ShadowRange>();
+    List<ShadowVertex> allShadowEdges = new List<ShadowVertex>();
 
     private List<Vector2> GetInnerStageVertex()
     {
@@ -88,6 +89,36 @@ public class ShadowIntersection : MonoBehaviour {
 
                 Vector2 stageVert1 = new Vector2(stageMeshVertices[k].x, stageMeshVertices[k].z);
                 Vector2 stageVert2 = new Vector2(stageMeshVertices[k2].x, stageMeshVertices[k2].z);
+
+                Vector2 vec2Player = new Vector2(player.position.x, player.position.z);
+                //Vector2 rayFromPlayer = (stageVert1 - vec2Player)*0.99f;
+
+                for(int shape = stageShape+1; shape < shapeCreator.shapes.Count; shape++)
+                {
+                    for (int p = 0; p < shapeCreator.shapes[shape].points.Count; p++)
+                    {
+                        Vector3 point1 = shapeCreator.shapes[shape].points[p];
+                        Vector3 point2 = new Vector3();
+                        if (!(p == shapeCreator.shapes[shape].points.Count - 1))
+                            point2 = shapeCreator.shapes[shape].points[p+1];
+                        else
+                            point2 = shapeCreator.shapes[shape].points[0];
+
+                        Vector2 pointVert1 = new Vector2(point1.x, point1.z);
+                        Vector2 pointVert2 = new Vector2(point2.x, point2.z);
+
+
+                        Vector2 tempIntersectionVector = new Vector2();
+                        if (intersection.LineIntersection(vec2Player, stageVert1, pointVert1, pointVert2, ref tempIntersectionVector))
+                        {
+
+                            p = shapeCreator.shapes[shape].points.Count;
+                            allShadowEdges.Add(new ShadowVertex(stageShape, stageVert1));
+
+                        }
+                    }
+                    
+                }
 
                 ShadowRange shadowRange = new ShadowRange();
                 shadowRange.meshIndex = i;
@@ -132,16 +163,15 @@ public class ShadowIntersection : MonoBehaviour {
     private void ComputeShadowBoundaries()
     {
 
-        List<ShadowVertex> allShadowEdges = new List<ShadowVertex>();
-
         for (int borderVertexIndex = 0; borderVertexIndex < shapeCreator.shapes[stageShape].points.Count; borderVertexIndex++)
         {
             Vector3 vertex = shapeCreator.shapes[stageShape].points[borderVertexIndex];
 
             //allShadowEdges.Add(new ShadowVertex(stageShape, vertex));
-            Debug.DrawLine(player.position, vertex);
+            //Debug.DrawLine(player.position, vertex);
             RaycastHit hit = new RaycastHit();
-            if(Physics.Raycast(player.position, (player.position - vertex).normalized, out hit))
+            Ray ray = new Ray(player.position, vertex - player.position);
+            if(Physics.Raycast(ray, out hit))
             {
                 Debug.Log("Hi");
                 allShadowEdges.Add(new ShadowVertex(stageShape, vertex));
@@ -182,6 +212,8 @@ public class ShadowIntersection : MonoBehaviour {
             sphere.transform.position = allShadowEdges[shadowVertex].position;
             sphere.transform.localScale = Vector3.one * 0.1f;
         }
+
+        allShadowEdges.Clear();
     }
 
 

@@ -29,5 +29,6 @@ public class ShapeCreator : MonoBehaviour {
         //meshCollider.sharedMesh = meshFilter.sharedMesh;
 
         meshCollider.sharedMesh = compShape.GetMesh();
+
     }
 }
